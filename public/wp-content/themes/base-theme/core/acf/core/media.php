@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 class acf_media {
-	
-	
+
+
 	/*
 	*  __construct
 	*
@@ -15,24 +15,24 @@ class acf_media {
 	*  @param	N/A
 	*  @return	N/A
 	*/
-	
+
 	function __construct() {
-		
+
 		// actions
-		add_action('acf/save_post', 				array($this, 'save_files'), 5, 1);
-		add_action('acf/input/admin_footer_js', 	array($this, 'admin_footer_js'));
-		
-		
+		add_action( 'acf/save_post', array( $this, 'save_files' ), 5, 1 );
+		add_action( 'acf/input/admin_footer_js', array( $this, 'admin_footer_js' ) );
+
+
 		// filters
-		add_filter('wp_handle_upload_prefilter', 	array($this, 'handle_upload_prefilter'), 10, 1);
-		
-		
+		add_filter( 'wp_handle_upload_prefilter', array( $this, 'handle_upload_prefilter' ), 10, 1 );
+
+
 		// ajax
-		add_action( 'wp_ajax_query-attachments',	array($this, 'wp_ajax_query_attachments'), -1);
-		
+		add_action( 'wp_ajax_query-attachments', array( $this, 'wp_ajax_query_attachments' ), - 1 );
+
 	}
-	
-	
+
+
 	/*
 	*  handle_upload_prefilter
 	*
@@ -45,52 +45,52 @@ class acf_media {
 	*  @param	$post_id (int)
 	*  @return	$post_id (int)
 	*/
-	
+
 	function handle_upload_prefilter( $file ) {
-		
+
 		// bail early if no acf field
-		if( empty($_POST['_acfuploader']) ) {
-		
+		if ( empty( $_POST['_acfuploader'] ) ) {
+
 			return $file;
-			
+
 		}
-		
-		
+
+
 		// load field
 		$field = acf_get_field( $_POST['_acfuploader'] );
-		
-		if( !$field ) {
-		
+
+		if ( ! $field ) {
+
 			return $file;
-			
+
 		}
-		
-		
+
+
 		// get errors
 		$errors = acf_validate_attachment( $file, $field, 'upload' );
-		
-		
+
+
 		// filter for 3rd party customization
-		$errors = apply_filters("acf/upload_prefilter", $errors, $file, $field);
-		$errors = apply_filters("acf/upload_prefilter/type={$field['type']}", $errors, $file, $field );
-		$errors = apply_filters("acf/upload_prefilter/name={$field['name']}", $errors, $file, $field );
-		$errors = apply_filters("acf/upload_prefilter/key={$field['key']}", $errors, $file, $field );
-		
-		
+		$errors = apply_filters( "acf/upload_prefilter", $errors, $file, $field );
+		$errors = apply_filters( "acf/upload_prefilter/type={$field['type']}", $errors, $file, $field );
+		$errors = apply_filters( "acf/upload_prefilter/name={$field['name']}", $errors, $file, $field );
+		$errors = apply_filters( "acf/upload_prefilter/key={$field['key']}", $errors, $file, $field );
+
+
 		// append error
-		if( !empty($errors) ) {
-			
-			$file['error'] = implode("\n", $errors);
-			
+		if ( ! empty( $errors ) ) {
+
+			$file['error'] = implode( "\n", $errors );
+
 		}
-		
-		
+
+
 		// return
 		return $file;
-		
+
 	}
 
-	
+
 	/*
 	*  save_files
 	*
@@ -103,23 +103,23 @@ class acf_media {
 	*  @param	$post_id (int)
 	*  @return	$post_id (int)
 	*/
-	
+
 	function save_files( $post_id = 0 ) {
-		
+
 		// bail early if no $_FILES data
-		if( empty($_FILES['acf']['name']) ) {
-			
+		if ( empty( $_FILES['acf']['name'] ) ) {
+
 			return;
-			
+
 		}
-		
-		
+
+
 		// upload files
 		acf_upload_files();
-	
+
 	}
-	
-	
+
+
 	/*
 	*  admin_footer_js
 	*
@@ -132,15 +132,15 @@ class acf_media {
 	*  @param	$post_id (int)
 	*  @return	$post_id (int)
 	*/
-	
+
 	function admin_footer_js() {
-		
+
 		?>acf.media.mime_types = <?php echo json_encode( get_allowed_mime_types() ); ?>;
-	<?php
-		
+		<?php
+
 	}
-	
-	
+
+
 	/*
 	*  wp_ajax_query_attachments
 	*
@@ -153,54 +153,54 @@ class acf_media {
 	*  @param	$post_id (int)
 	*  @return	$post_id (int)
 	*/
-	
+
 	function wp_ajax_query_attachments() {
-		
-		add_filter('wp_prepare_attachment_for_js', 	array($this, 'wp_prepare_attachment_for_js'), 10, 3);
-		
+
+		add_filter( 'wp_prepare_attachment_for_js', array( $this, 'wp_prepare_attachment_for_js' ), 10, 3 );
+
 	}
-	
+
 	function wp_prepare_attachment_for_js( $response, $attachment, $meta ) {
-		
+
 		// append attribute
 		$response['acf_errors'] = false;
-		
-		
+
+
 		// bail early if no acf field
-		if( empty($_POST['query']['_acfuploader']) ) {
-		
+		if ( empty( $_POST['query']['_acfuploader'] ) ) {
+
 			return $response;
-			
+
 		}
-		
-		
+
+
 		// load field
 		$field = acf_get_field( $_POST['query']['_acfuploader'] );
-		
-		if( !$field ) {
-		
+
+		if ( ! $field ) {
+
 			return $response;
-			
+
 		}
-		
-		
+
+
 		// get errors
 		$errors = acf_validate_attachment( $response, $field, 'prepare' );
-		
-		
+
+
 		// append errors
-		if( !empty($errors) ) {
-			
-			$response['acf_errors'] = implode('<br />', $errors);
-			
+		if ( ! empty( $errors ) ) {
+
+			$response['acf_errors'] = implode( '<br />', $errors );
+
 		}
-		
-		
+
+
 		// return
 		return $response;
-		
+
 	}
-	
+
 }
 
 

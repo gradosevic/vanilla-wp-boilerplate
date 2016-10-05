@@ -21,7 +21,7 @@ class acf_settings_addons {
 	function __construct() {
 
 		// actions
-		add_action( 'admin_menu', 				array( $this, 'admin_menu' ) );
+		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 	}
 
 
@@ -41,18 +41,20 @@ class acf_settings_addons {
 	function admin_menu() {
 
 		// bail early if no show_admin
-		if( !acf_get_setting('show_admin') )
-		{
+		if ( ! acf_get_setting( 'show_admin' ) ) {
 			return;
 		}
 
 
 		// add page
-		$page = add_submenu_page('edit.php?post_type=acf-field-group', __('Add-ons','acf'), __('Add-ons','acf'), acf_get_setting('capability'),'acf-settings-addons', array($this,'html') );
+		$page = add_submenu_page( 'edit.php?post_type=acf-field-group', __( 'Add-ons', 'acf' ), __( 'Add-ons', 'acf' ), acf_get_setting( 'capability' ), 'acf-settings-addons', array(
+			$this,
+			'html'
+		) );
 
 
 		// actions
-		add_action('load-' . $page, array($this,'load'));
+		add_action( 'load-' . $page, array( $this, 'load' ) );
 
 	}
 
@@ -74,22 +76,19 @@ class acf_settings_addons {
 
 		// vars
 		$this->view = array(
-			'json'		=> array(),
+			'json' => array(),
 		);
 
 
 		// load json
-        $request = wp_remote_post( 'http://assets.advancedcustomfields.com/add-ons/add-ons.json' );
+		$request = wp_remote_post( 'http://assets.advancedcustomfields.com/add-ons/add-ons.json' );
 
-        // validate
-        if( is_wp_error($request) || wp_remote_retrieve_response_code($request) != 200)
-        {
-        	acf_add_admin_notice(__('<b>Error</b>. Could not load add-ons list', 'acf'), 'error');
-        }
-        else
-        {
-	        $this->view['json'] = json_decode( $request['body'], true );
-        }
+		// validate
+		if ( is_wp_error( $request ) || wp_remote_retrieve_response_code( $request ) != 200 ) {
+			acf_add_admin_notice( __( '<b>Error</b>. Could not load add-ons list', 'acf' ), 'error' );
+		} else {
+			$this->view['json'] = json_decode( $request['body'], true );
+		}
 
 	}
 
@@ -110,7 +109,7 @@ class acf_settings_addons {
 	function html() {
 
 		// load view
-		acf_get_view('settings-addons', $this->view);
+		acf_get_view( 'settings-addons', $this->view );
 
 	}
 

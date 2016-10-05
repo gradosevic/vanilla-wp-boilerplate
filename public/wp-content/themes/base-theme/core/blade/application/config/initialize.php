@@ -32,8 +32,9 @@
 
 $config = array( 'constants' );
 
-foreach ( $config	as $filename )
-	require_once ( WP_BLADE_CONFIG_PATH . $filename . '.php' );
+foreach ( $config as $filename ) {
+	require_once( WP_BLADE_CONFIG_PATH . $filename . '.php' );
+}
 
 
 /*
@@ -46,8 +47,9 @@ foreach ( $config	as $filename )
 */
 $libraries = array( 'laravel/blade', 'laravel/section', 'laravel/view', 'laravel/event' );
 
-foreach ( $libraries as $filename )
+foreach ( $libraries as $filename ) {
 	require_once( WP_BLADE_LIBRARIES_PATH . $filename . '.php' );
+}
 
 
 /*
@@ -61,8 +63,9 @@ foreach ( $libraries as $filename )
 
 $helpers = array( 'wp-blade', 'helpers' );
 
-foreach ( $helpers as $filename )
+foreach ( $helpers as $filename ) {
 	require_once( WP_BLADE_HELPERS_PATH . $filename . '.php' );
+}
 
 
 /*
@@ -77,8 +80,9 @@ foreach ( $helpers as $filename )
 
 $models = array( 'main-model' );
 
-foreach ( $models as $filename )
-	require_once ( WP_BLADE_MODELS_PATH . $filename . '.php' );
+foreach ( $models as $filename ) {
+	require_once( WP_BLADE_MODELS_PATH . $filename . '.php' );
+}
 
 /*
 |---------------------------------------------------------------------------
@@ -92,5 +96,6 @@ foreach ( $models as $filename )
 
 $controllers = array( 'main-controller' );
 
-foreach ( $controllers as $filename )
-	require_once ( WP_BLADE_CONTROLLERS_PATH . $filename . '.php' );
+foreach ( $controllers as $filename ) {
+	require_once( WP_BLADE_CONTROLLERS_PATH . $filename . '.php' );
+}

@@ -1,13 +1,13 @@
 <?php
 /**
-*
-* Main plugin class
-* @package Blade
-*/
+ *
+ * Main plugin class
+ * @package Blade
+ */
 
 /**
-* Main controller
-*/
+ * Main controller
+ */
 class WP_Blade_Main_Controller {
 
 	/**
@@ -36,7 +36,7 @@ class WP_Blade_Main_Controller {
 		add_filter( 'page_template', array( $this->main_model, 'get_query_template' ) );
 
 		// Listen for Buddypress include action
-		add_filter( 'bp_template_include', array( $this->main_model, 'get_query_template' ));
+		add_filter( 'bp_template_include', array( $this->main_model, 'get_query_template' ) );
 
 	}
 

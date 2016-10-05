@@ -41,26 +41,22 @@ class Blade {
 	 *
 	 * @return void
 	 */
-	public static function sharpen()
-	{
-		Event::listen(View::engine, function($view)
-		{
+	public static function sharpen() {
+		Event::listen( View::engine, function ( $view ) {
 			// The Blade view engine should only handle the rendering of views which
 			// end with the Blade extension. If the given view does not, we will
 			// return false so the View can be rendered as normal.
-			if ( ! str_contains($view->path, BLADE_EXT))
-			{
+			if ( ! str_contains( $view->path, BLADE_EXT ) ) {
 				return;
 			}
 
-			$compiled = Blade::compiled($view->path);
+			$compiled = Blade::compiled( $view->path );
 
 			// If the view doesn't exist or has been modified since the last time it
 			// was compiled, we will recompile the view into pure PHP from it's
 			// Blade representation, writing it to cached storage.
-			if ( ! file_exists($compiled) or Blade::expired($view->view, $view->path))
-			{
-				file_put_contents($compiled, Blade::compile($view));
+			if ( ! file_exists( $compiled ) or Blade::expired( $view->view, $view->path ) ) {
+				file_put_contents( $compiled, Blade::compile( $view ) );
 			}
 
 			$view->path = $compiled;
@@ -68,157 +64,179 @@ class Blade {
 			// Once the view has been compiled, we can simply set the path to the
 			// compiled view on the view instance and call the typical "get"
 			// method on the view to evaluate the compiled PHP view.
-			return ltrim($view->get());
-		});
+			return ltrim( $view->get() );
+		} );
+	}
+
+	/**
+	 * Get the fully qualified path for a compiled view.
+	 *
+	 * @param  string $view
+	 *
+	 * @return string
+	 */
+	public static function compiled( $path ) {
+		//return path('storage').'views/'.md5($path);
+		global $blade_storage_path;
+
+		return $blade_storage_path . '/' . md5( $path );
+	}
+
+	/**
+	 * Determine if a view is "expired" and needs to be re-compiled.
+	 *
+	 * @param  string $view
+	 * @param  string $path
+	 *
+	 * @return bool
+	 */
+	public static function expired( $view, $path ) {
+		return filemtime( $path ) > filemtime( static::compiled( $path ) );
+	}
+
+	/**
+	 * Compiles the specified file containing Blade pseudo-code into valid PHP.
+	 *
+	 * @param  string $path
+	 *
+	 * @return string
+	 */
+	public static function compile( $view ) {
+		return static::compile_string( file_get_contents( $view->path ), $view );
+	}
+
+	/**
+	 * Compiles the given string containing Blade pseudo-code into valid PHP.
+	 *
+	 * @param  string $value
+	 * @param  View $view
+	 *
+	 * @return string
+	 */
+	public static function compile_string( $value, $view = null ) {
+		foreach ( static::$compilers as $compiler ) {
+			$method = "compile_{$compiler}";
+
+			$value = static::$method( $value, $view );
+		}
+		$value = \WP_Blade::compile_string( $value, $view );
+
+		return $value;
 	}
 
 	/**
 	 * Register a custom Blade compiler.
 	 *
 	 * <code>
-	 * 		Blade::extend(function($view)
-	 *		{
-	 * 			return str_replace('foo', 'bar', $view);
-	 * 		});
+	 *        Blade::extend(function($view)
+	 *        {
+	 *            return str_replace('foo', 'bar', $view);
+	 *        });
 	 * </code>
 	 *
-	 * @param  Closure  $compiler
+	 * @param  Closure $compiler
+	 *
 	 * @return void
 	 */
-	public static function extend(Closure $compiler)
-	{
+	public static function extend( Closure $compiler ) {
 		static::$extensions[] = $compiler;
-	}
-
-	/**
-	 * Determine if a view is "expired" and needs to be re-compiled.
-	 *
-	 * @param  string  $view
-	 * @param  string  $path
-	 * @return bool
-	 */
-	public static function expired($view, $path)
-	{
-		return filemtime($path) > filemtime(static::compiled($path));
-	}
-
-	/**
-	 * Compiles the specified file containing Blade pseudo-code into valid PHP.
-	 *
-	 * @param  string  $path
-	 * @return string
-	 */
-	public static function compile($view)
-	{
-		return static::compile_string(file_get_contents($view->path), $view);
-	}
-
-	/**
-	 * Compiles the given string containing Blade pseudo-code into valid PHP.
-	 *
-	 * @param  string  $value
-	 * @param  View    $view
-	 * @return string
-	 */
-	public static function compile_string($value, $view = null)
-	{
-		foreach (static::$compilers as $compiler)
-		{
-			$method = "compile_{$compiler}";
-
-			$value = static::$method($value, $view);
-		}
-		$value = \WP_Blade::compile_string($value, $view);
-
-		return $value;
 	}
 
 	/**
 	 * Rewrites Blade "@layout" expressions into valid PHP.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_layouts($value)
-	{
+	protected static function compile_layouts( $value ) {
 		// If the Blade template is not using "layouts", we'll just return it
 		// unchanged since there is nothing to do with layouts and we will
 		// just let the other Blade compilers handle the rest.
-		if ( ! starts_with($value, '@layout'))
-		{
+		if ( ! starts_with( $value, '@layout' ) ) {
 			return $value;
 		}
 
 		//Strip end of file
-		$value = rtrim($value);
+		$value = rtrim( $value );
 
 		// First we'll split out the lines of the template so we can get the
 		// layout from the top of the template. By convention it must be
 		// located on the first line of the template contents.
-		$lines = preg_split("/(\r?\n)/", $value);
+		$lines = preg_split( "/(\r?\n)/", $value );
 
-		$pattern = static::matcher('layout');
+		$pattern = static::matcher( 'layout' );
 
-		$lines[] = preg_replace($pattern, '$1@include$2', $lines[0]);
+		$lines[] = preg_replace( $pattern, '$1@include$2', $lines[0] );
 
 		// We will add a "render" statement to the end of the templates and
 		// then slice off the "@layout" shortcut from the start so the
 		// sections register before the parent template renders.
-		return implode(CRLF, array_slice($lines, 1));
+		return implode( CRLF, array_slice( $lines, 1 ) );
+	}
+
+	/**
+	 * Get the regular expression for a generic Blade function.
+	 *
+	 * @param  string $function
+	 *
+	 * @return string
+	 */
+	public static function matcher( $function ) {
+		return '/(\s*)@' . $function . '(\s*\(.*\))/';
 	}
 
 	/**
 	 * Extract a variable value out of a Blade expression.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function extract($value, $expression)
-	{
-		preg_match('/@layout(\s*\(.*\))(\s*)/', $value, $matches);
+	protected static function extract( $value, $expression ) {
+		preg_match( '/@layout(\s*\(.*\))(\s*)/', $value, $matches );
 
-		return str_replace(array("('", "')"), '', $matches[1]);
+		return str_replace( array( "('", "')" ), '', $matches[1] );
 	}
 
 	/**
 	 * Rewrites Blade comments into PHP comments.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_comments($value)
-	{
-		$value = preg_replace('/\{\{--(.+?)(--\}\})?\n/', "<?php // $1 ?>", $value);
+	protected static function compile_comments( $value ) {
+		$value = preg_replace( '/\{\{--(.+?)(--\}\})?\n/', "<?php // $1 ?>", $value );
 
-		return preg_replace('/\{\{--((.|\s)*?)--\}\}/', "<?php /* $1 */ ?>\n", $value);
+		return preg_replace( '/\{\{--((.|\s)*?)--\}\}/', "<?php /* $1 */ ?>\n", $value );
 	}
 
 	/**
 	 * Rewrites Blade echo statements into PHP echo statements.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_echos($value)
-	{
-		$value = preg_replace('/\{\{\{(.+?)\}\}\}/', '<?php echo HTML::entities($1); ?>', $value);
+	protected static function compile_echos( $value ) {
+		$value = preg_replace( '/\{\{\{(.+?)\}\}\}/', '<?php echo HTML::entities($1); ?>', $value );
 
-		return preg_replace('/\{\{(.+?)\}\}/', '<?php echo $1; ?>', $value);
+		return preg_replace( '/\{\{(.+?)\}\}/', '<?php echo $1; ?>', $value );
 	}
 
 	/**
 	 * Rewrites Blade "for else" statements into valid PHP.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_forelse($value)
-	{
-		preg_match_all('/(\s*)@forelse(\s*\(.*\))(\s*)/', $value, $matches);
+	protected static function compile_forelse( $value ) {
+		preg_match_all( '/(\s*)@forelse(\s*\(.*\))(\s*)/', $value, $matches );
 
-		foreach ($matches[0] as $forelse)
-		{
-			preg_match('/\s*\(\s*(\S*)\s/', $forelse, $variable);
+		foreach ( $matches[0] as $forelse ) {
+			preg_match( '/\s*\(\s*(\S*)\s/', $forelse, $variable );
 
 			// Once we have extracted the variable being looped against, we can add
 			// an if statement to the start of the loop that checks if the count
@@ -227,14 +245,14 @@ class Blade {
 
 			$search = '/(\s*)@forelse(\s*\(.*\))/';
 
-			$replace = '$1'.$if.'<?php foreach$2: ?>';
+			$replace = '$1' . $if . '<?php foreach$2: ?>';
 
-			$blade = preg_replace($search, $replace, $forelse);
+			$blade = preg_replace( $search, $replace, $forelse );
 
 			// Finally, once we have the check prepended to the loop we'll replace
 			// all instances of this forelse syntax in the view content of the
 			// view being compiled to Blade syntax with real PHP syntax.
-			$value = str_replace($forelse, $blade, $value);
+			$value = str_replace( $forelse, $blade, $value );
 		}
 
 		return $value;
@@ -243,123 +261,123 @@ class Blade {
 	/**
 	 * Rewrites Blade "empty" statements into valid PHP.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_empty($value)
-	{
-		return str_replace('@empty', '<?php endforeach; ?><?php else: ?>', $value);
+	protected static function compile_empty( $value ) {
+		return str_replace( '@empty', '<?php endforeach; ?><?php else: ?>', $value );
 	}
 
 	/**
 	 * Rewrites Blade "forelse" endings into valid PHP.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_endforelse($value)
-	{
-		return str_replace('@endforelse', '<?php endif; ?>', $value);
+	protected static function compile_endforelse( $value ) {
+		return str_replace( '@endforelse', '<?php endif; ?>', $value );
 	}
 
 	/**
 	 * Rewrites Blade structure openings into PHP structure openings.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_structure_openings($value)
-	{
+	protected static function compile_structure_openings( $value ) {
 		$pattern = '/(\s*)@(if|elseif|foreach|for|while)(\s*\(.*\))/';
 
-		return preg_replace($pattern, '$1<?php $2$3: ?>', $value);
+		return preg_replace( $pattern, '$1<?php $2$3: ?>', $value );
 	}
 
 	/**
 	 * Rewrites Blade structure closings into PHP structure closings.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_structure_closings($value)
-	{
+	protected static function compile_structure_closings( $value ) {
 		$pattern = '/(\s*)@(endif|endforeach|endfor|endwhile)(\s*)/';
 
-		return preg_replace($pattern, '$1<?php $2; ?>$3', $value);
+		return preg_replace( $pattern, '$1<?php $2; ?>$3', $value );
 	}
 
 	/**
 	 * Rewrites Blade else statements into PHP else statements.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_else($value)
-	{
-		return preg_replace('/(\s*)@(else)(\s*)/', '$1<?php $2: ?>$3', $value);
+	protected static function compile_else( $value ) {
+		return preg_replace( '/(\s*)@(else)(\s*)/', '$1<?php $2: ?>$3', $value );
 	}
 
 	/**
 	 * Rewrites Blade "unless" statements into valid PHP.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_unless($value)
-	{
+	protected static function compile_unless( $value ) {
 		$pattern = '/(\s*)@unless(\s*\(.*\))/';
 
-		return preg_replace($pattern, '$1<?php if ( ! ($2)): ?>', $value);
+		return preg_replace( $pattern, '$1<?php if ( ! ($2)): ?>', $value );
 	}
 
 	/**
 	 * Rewrites Blade "unless" endings into valid PHP.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_endunless($value)
-	{
-		return str_replace('@endunless', '<?php endif; ?>', $value);
+	protected static function compile_endunless( $value ) {
+		return str_replace( '@endunless', '<?php endif; ?>', $value );
 	}
 
 	/**
 	 * Rewrites Blade @include statements into valid PHP.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_includes($value)
-	{
-		$pattern = static::matcher('include');
+	protected static function compile_includes( $value ) {
+		$pattern = static::matcher( 'include' );
 
-		return preg_replace($pattern, '$1<?php echo view$2->with(get_defined_vars())->render(); ?>', $value);
+		return preg_replace( $pattern, '$1<?php echo view$2->with(get_defined_vars())->render(); ?>', $value );
 	}
 
 	/**
 	 * Rewrites Blade @render statements into valid PHP.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_render($value)
-	{
-		$pattern = static::matcher('render');
+	protected static function compile_render( $value ) {
+		$pattern = static::matcher( 'render' );
 
-		return preg_replace($pattern, '$1<?php echo render$2; ?>', $value);
+		return preg_replace( $pattern, '$1<?php echo render$2; ?>', $value );
 	}
 
 	/**
 	 * Rewrites Blade @render_each statements into valid PHP.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_render_each($value)
-	{
-		$pattern = static::matcher('render_each');
+	protected static function compile_render_each( $value ) {
+		$pattern = static::matcher( 'render_each' );
 
-		return preg_replace($pattern, '$1<?php echo render_each$2; ?>', $value);
+		return preg_replace( $pattern, '$1<?php echo render_each$2; ?>', $value );
 	}
 
 	/**
@@ -367,13 +385,14 @@ class Blade {
 	 *
 	 * The Blade @yield statement is a shortcut to the Section::yield method.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_yields($value)
-	{
-		$pattern = static::matcher('yield');
-		return preg_replace($pattern, '$1<?php echo \\Laravel\\Section::do_yield$2; ?>', $value);
+	protected static function compile_yields( $value ) {
+		$pattern = static::matcher( 'yield' );
+
+		return preg_replace( $pattern, '$1<?php echo \\Laravel\\Section::do_yield$2; ?>', $value );
 	}
 
 	/**
@@ -381,11 +400,10 @@ class Blade {
 	 *
 	 * @return string
 	 */
-	protected static function compile_yield_sections($value)
-	{
+	protected static function compile_yield_sections( $value ) {
 		$replace = '<?php echo \\Laravel\\Section::yield_section(); ?>';
 
-		return str_replace('@yield_section', $replace, $value);
+		return str_replace( '@yield_section', $replace, $value );
 	}
 
 	/**
@@ -393,14 +411,14 @@ class Blade {
 	 *
 	 * The Blade @section statement is a shortcut to the Section::start method.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_section_start($value)
-	{
-		$pattern = static::matcher('section');
+	protected static function compile_section_start( $value ) {
+		$pattern = static::matcher( 'section' );
 
-		return preg_replace($pattern, '$1<?php \\Laravel\\Section::start$2; ?>', $value);
+		return preg_replace( $pattern, '$1<?php \\Laravel\\Section::start$2; ?>', $value );
 	}
 
 	/**
@@ -408,52 +426,27 @@ class Blade {
 	 *
 	 * The Blade @endsection statement is a shortcut to the Section::stop method.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_section_end($value)
-	{
-		return preg_replace('/@endsection/', '<?php \\Laravel\\Section::stop(); ?>', $value);
+	protected static function compile_section_end( $value ) {
+		return preg_replace( '/@endsection/', '<?php \\Laravel\\Section::stop(); ?>', $value );
 	}
 
 	/**
 	 * Execute user defined compilers.
 	 *
-	 * @param  string  $value
+	 * @param  string $value
+	 *
 	 * @return string
 	 */
-	protected static function compile_extensions($value)
-	{
-		foreach (static::$extensions as $compiler)
-		{
-			$value = $compiler($value);
+	protected static function compile_extensions( $value ) {
+		foreach ( static::$extensions as $compiler ) {
+			$value = $compiler( $value );
 		}
 
 		return $value;
-	}
-
-	/**
-	 * Get the regular expression for a generic Blade function.
-	 *
-	 * @param  string  $function
-	 * @return string
-	 */
-	public static function matcher($function)
-	{
-		return '/(\s*)@'.$function.'(\s*\(.*\))/';
-	}
-
-	/**
-	 * Get the fully qualified path for a compiled view.
-	 *
-	 * @param  string  $view
-	 * @return string
-	 */
-	public static function compiled($path)
-	{
-		//return path('storage').'views/'.md5($path);
-		global $blade_storage_path;
-		return $blade_storage_path.'/'.md5($path);
 	}
 
 }

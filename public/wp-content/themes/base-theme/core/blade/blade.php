@@ -7,8 +7,8 @@
 define( 'WP_BLADE_ROOT', dirname( __FILE__ ) . '/' );
 
 /**
-* Path for the application folder inside the theme
-*/
+ * Path for the application folder inside the theme
+ */
 define( 'WP_BLADE_APP_PATH', WP_BLADE_ROOT . '/application/' );
 
 /**
@@ -17,15 +17,15 @@ define( 'WP_BLADE_APP_PATH', WP_BLADE_ROOT . '/application/' );
 define( 'WP_BLADE_ASSETS_PATH', WP_BLADE_ROOT . 'assets/' );
 
 /**
-* Path for the config folder
-*/
+ * Path for the config folder
+ */
 define( 'WP_BLADE_CONFIG_PATH', WP_BLADE_APP_PATH . 'config/' );
 
 /**
-* Path for libraries
-*/
+ * Path for libraries
+ */
 define( 'WP_BLADE_LIBRARIES_PATH', WP_BLADE_APP_PATH . 'lib/' );
 
 
-require_once ( WP_BLADE_CONFIG_PATH . '/initialize.php' );
+require_once( WP_BLADE_CONFIG_PATH . '/initialize.php' );
 WP_Blade_Main_Controller::make();
