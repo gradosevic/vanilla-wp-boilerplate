@@ -31,7 +31,7 @@ define( 'WP_BLADE_CONTROLLERS_PATH', WP_BLADE_APP_PATH . 'controllers/' );
 /**
  * Path for views
  */
-define( 'WP_BLADE_VIEWS_PATH', WP_BLADE_APP_PATH . 'views/' );
+define( 'WP_BLADE_VIEWS_PATH', realpath(WP_BLADE_ROOT . '../../views') . '/' );
 
 /**
  * Storage path

@@ -30,14 +30,13 @@ class WP_Blade_Main_Controller {
 		add_action( 'template_include', array( $this->main_model, 'template_include_blade' ) );
 
 		// Listen for index template filter
-		add_filter( 'index_template', array( $this->main_model, 'get_query_template' ) );
+		add_filter( 'index_template', array( $this->main_model, 'template_include_blade' ) );
 
 		// Listen for page template filter
-		add_filter( 'page_template', array( $this->main_model, 'get_query_template' ) );
+		add_filter( 'page_template', array( $this->main_model, 'template_include_blade' ) );
 
 		// Listen for Buddypress include action
-		add_filter( 'bp_template_include', array( $this->main_model, 'get_query_template' ) );
-
+		add_filter( 'bp_template_include', array( $this->main_model, 'template_include_blade' ) );
 	}
 
 	/**

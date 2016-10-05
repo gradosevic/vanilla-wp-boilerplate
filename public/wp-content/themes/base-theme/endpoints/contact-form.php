@@ -48,5 +48,4 @@ function custom_contact_form_submission() {
 	);
 
 	die( json_encode( $error ) );
-
 }

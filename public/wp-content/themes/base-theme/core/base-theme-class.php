@@ -152,6 +152,7 @@ abstract class base_theme_class {
 	 * Loads the blade template engine.
 	 */
 	protected function load_blade_templating() {
+
 		if ( ! class_exists( 'WP_Blade_Main_Controller' ) ) {
 			include_once( 'blade/blade.php' );
 		}
@@ -161,6 +162,7 @@ abstract class base_theme_class {
 	 * Loads ACF if the plugin is not included.
 	 */
 	public function include_advanced_custom_fields() {
+
 		if ( ! class_exists( 'acf' ) ) {
 			add_filter( 'acf/settings/path', array( $this, 'my_acf_settings_path' ) );
 			add_filter( 'acf/settings/dir', array( $this, 'my_acf_settings_dir' ) );
@@ -186,6 +188,7 @@ abstract class base_theme_class {
 	 * Display the specified resource.
 	 */
 	protected function load_thumbnail_support() {
+
 		if ( $this->load_thumbnail_support === true ) {
 			add_theme_support( 'post-thumbnails' );
 		}
@@ -205,15 +208,10 @@ abstract class base_theme_class {
 	 */
 	protected function load_menu_support() {
 
-
 		if ( is_array( $this->menus ) ) {
-
 			add_theme_support( 'menus' );
-
 			register_nav_menus( $this->menus );
-
 		}
-
 	}
 
 	/**
@@ -234,17 +232,17 @@ abstract class base_theme_class {
 		remove_action( 'wp_head', 'index_rel_link' );
 		remove_action( 'wp_head', 'wlwmanifest_link' );
 		remove_action( 'wp_head', 'feed_links_extra', 3 );
-		remove_action( 'wp_head', 'start_post_rel_link', 10, 0 );
-		remove_action( 'wp_head', 'parent_post_rel_link', 10, 0 );
-		remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10, 0 );
+		remove_action( 'wp_head', 'start_post_rel_link', 10 );
+		remove_action( 'wp_head', 'parent_post_rel_link', 10 );
+		remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head', 10);
 
 	}
 
 	/**
 	 * This method will loop through the $custom_post_types array and generate the register_post_type function call.
-	 *
 	 */
 	public function add_custom_post_types() {
+
 		/* loads the CPTs from functions.php */
 		$this->load_custom_post_types();
 
@@ -262,38 +260,29 @@ abstract class base_theme_class {
 
 	/**
 	 * This method will loop through the $custom_post_types array and generate the register_post_type function call.
-	 *
 	 */
 	public function add_custom_taxonomies() {
+
 		/* loads the custom taxonomies from functions.php */
 		$this->load_custom_taxonomies();
 
 		if ( is_array( $this->custom_taxonomies ) ) {
-
 			foreach ( $this->custom_taxonomies as $taxonomy_name => $options ) {
-
 				$belongs_to_post_type = $options['belongs_to_post_type'];
 
-
 				if ( ! post_type_exists( $belongs_to_post_type ) ) {
-
 					add_action( 'admin_notices', function () use ( $taxonomy_name ) {
-
 						$class   = "error";
 						$message = "The taxonomy you are trying to register in functions.php references a custom post type that does not exist.  Please make sure you are properly registering your custom post type in the functions.php load_custom_post_types method.  The CPT from this error is called: <strong>{$taxonomy_name}</strong>.";
 						echo "<div class=\"$class\"> <p>$message</p></div>";
-
 					} );
 				}
 
 				unset( $options['belongs_to_post_type'] );
 
 				register_taxonomy( $taxonomy_name, $belongs_to_post_type, $options );
-
 			}
-
 		}
-
 	}
 
 	/**
@@ -305,7 +294,6 @@ abstract class base_theme_class {
 	 */
 	public function load_files() {
 
-
 		$files_to_load = array(
 			'inc/Helper.php'
 		);
@@ -314,20 +302,20 @@ abstract class base_theme_class {
 			require_once $file;
 		}
 
-
 		$custom_endpoints = get_template_directory() . '/endpoints/';
 
 		$files = glob( $custom_endpoints . '*' );
-
 
 		foreach ( $files as $file ) {
 			if ( is_file( $file ) ) {
 				require_once $file;
 			}
 		}
-
 	}
 
+	/**
+	 *
+	 */
 	public function load_wp_cli_commands() {
 		if ( defined( 'WP_CLI' ) && \WP_CLI ) {
 
@@ -343,37 +331,38 @@ abstract class base_theme_class {
 			\WP_CLI::add_command( 'devmode', '\DevMode_Command' );
 			\WP_CLI::add_command( 'url', '\UpdateSiteUrl_Command' );
 		}
-
-
 	}
 
 	/**
 	 * Clean up the_excerpt()
+	 *
+	 * @param $more
+	 *
+	 * @return string
 	 */
 	public function excerpt_more( $more ) {
 
-
 		if ( ! is_null( $this->excerpt_text ) ) {
-
 			return '... <a href="' . get_permalink() . '">' . $this->excerpt_text . '</a>';
-
 		} else {
-
 			return '...';
-
 		}
-
-
 	}
 
+	/**
+	 *
+	 */
 	public function load_additional_head_js_css() {
+
 		echo get_field( 'header_css_js_custom', 'option' );
 	}
 
+	/**
+	 *
+	 */
 	public function load_additional_footer_js() {
 
 		echo get_field( 'custom_js_footer', 'option' );
-
 	}
 
 	/**
@@ -381,10 +370,10 @@ abstract class base_theme_class {
 	 *
 	 */
 	public function load_scripts() {
+
 		if ( $this->include_jquery === false ) {
 			wp_deregister_script( 'jquery' );
 			wp_enqueue_script( 'jquery', asset( 'compiled/js/theme.js' ), null, $this->version, true );
-
 		} else {
 			wp_enqueue_script( $this->theme_name . '-script', asset( 'compiled/js/theme.js' ), array( 'jquery' ), $this->version, true );
 		}
@@ -393,19 +382,14 @@ abstract class base_theme_class {
 
 	/**
 	 * Loads the theme styles.
-	 *
 	 */
 	public function load_styles() {
-		wp_enqueue_style( $this->theme_name . '-style', asset( 'compiled/css/theme.css' ), array(), $this->version );
 
+		wp_enqueue_style( $this->theme_name . '-style', asset( 'compiled/css/theme.css' ), array(), $this->version );
 	}
 
 	/**
 	 * Returms the path to the favicon files for the head of the site.
-	 *
-	 * @param  $faviconPath - this should be absolute path to the favicon file.
-	 * @param  $additionalIconPath :
-	 *           - array('72x72' => 'path/to/image.png', '144x144' => 'path/to/image')
 	 *
 	 * @return HTML output
 	 */
@@ -422,10 +406,7 @@ abstract class base_theme_class {
 
 		if ( $otherIcons ) {
 			foreach ( $otherIcons as $icon ) {
-
-
 				$output .= "<link rel='apple-touch-icon' type='image/png' sizes='{$icon['size']}' href='{$icon['image']}'>\n";
-
 			}
 		}
 
@@ -434,15 +415,11 @@ abstract class base_theme_class {
 
 	/**
 	 * Clears the blade view cache in development
-	 *
 	 */
 	public function clear_blade_cache() {
 
-
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
-
 			$cachedViewsDirectory = WP_BLADE_ROOT . 'storage/views/';
-
 
 			$files = glob( $cachedViewsDirectory . '*' );
 
@@ -451,17 +428,20 @@ abstract class base_theme_class {
 					@unlink( $file );
 				}
 			}
-
 		}
-
 	}
 
+	/**
+	 * @param $value
+	 * @param $post_id
+	 * @param $field
+	 *
+	 * @return mixed
+	 */
 	public function parse_template_directory( $value, $post_id, $field ) {
 
 		$searchAndReplace = array(
-
 			'{IMAGEPATH}' => get_template_directory_uri() . '/public/images'
-
 		);
 
 		foreach ( $searchAndReplace as $search => $replace ) {
@@ -471,24 +451,35 @@ abstract class base_theme_class {
 		return $value;
 	}
 
+	/**
+	 * @param $path
+	 *
+	 * @return string
+	 */
 	public function my_acf_settings_path( $path ) {
 
 		$path = get_stylesheet_directory() . '/core/acf/';
 
 		return $path;
-
 	}
 
+	/**
+	 * @param $dir
+	 *
+	 * @return string
+	 */
 	public function my_acf_settings_dir( $dir ) {
 
 		$dir = get_stylesheet_directory_uri() . '/core/acf/';
 
 		return $dir;
-
 	}
 
 	/**
-	 * Uneeded pingback header.
+	 * Removes unneded pingback header.
+	 * @param $headers
+	 *
+	 * @return mixed
 	 */
 	public function remove_x_pingback( $headers ) {
 
@@ -496,5 +487,4 @@ abstract class base_theme_class {
 
 		return $headers;
 	}
-
 }

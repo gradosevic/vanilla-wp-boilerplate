@@ -19,22 +19,19 @@ class WP_Blade_Main_Model {
 	}
 
 	/**
-	 * Return a call of templateinclude blade passing template path.
-	 *
-	 * @param string $template
-	 * @return string path of the compiled view path of the compiled view
-	 */
-	function get_query_template( $template ) {
-		return $this->template_include_blade( $template );
-	}
-
-	/**
 	 * Handle the compilation of the templates
 	 *
 	 * @param string template path
 	 * @return string compiled template path compiled template path
 	 */
 	public function template_include_blade( $template ) {
+
+		if ($post_type = get_post_type_object(get_post_type())) {
+			if ($single_post_view = $post_type->single_post_view) {
+				$template = WP_BLADE_VIEWS_PATH . $single_post_view . '.php';
+			}
+		}
+
 		if ( $this->bladedTemplate ) {
 			return $this->bladedTemplate;
 		}
@@ -44,6 +41,14 @@ class WP_Blade_Main_Model {
 		}
 
 		require_once( WP_BLADE_CONFIG_PATH . 'paths.php' );
+
+		// Lookup a blade template
+		$pathinfo = pathinfo( $template );
+		$bladeTemplate = $pathinfo['dirname'] . DS . $pathinfo['filename'] . '.blade.php';
+
+		if ( file_exists( $bladeTemplate ) ) {
+			$template = $bladeTemplate;
+		}
 
 		Laravel\Blade::sharpen();
 		$view = Laravel\View::make( 'path: ' . $template, array() );

@@ -62,21 +62,19 @@ class Theme extends base_theme_class {
 	public function load_custom_post_types() {
 		// Sample Custom Post Type - Add as many as you'd like
 
-		/*
-		$this->custom_post_types['testimonial'] = array(
+		$this->custom_post_types['event'] = array(
 
-			'label' => 'Testimonials',
+			'label' => 'Events',
 			'description' => 'This is the testimonial custom post type',
 			'public' => true,
 			'exclude_from_search' => true,
 			'show_ui' => true,
 			'supports' => array('title', 'editor'),
 			'has_archive' => false,
-			'rewrite' => false
-
+			'rewrite' => false,
+			'single_post_view' => 'event',
 			// any additional options can be added as defined in WP codex: https://codex.wordpress.org/Function_Reference/register_post_type
 		);
-		*/
 	}
 
 	/**
