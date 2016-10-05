@@ -9,75 +9,57 @@ namespace BaseTheme;
 include_once( 'core/base-theme-class.php' );
 
 class Theme extends base_theme_class {
-
-
-	/*
-
-	Allows you to disable WordPress from including jQuery by default.
-
-	You should only set this to value if your theme.js file includes jQuery.
-
-	*/
+	/**
+	 * Allows you to disable WordPress from including jQuery by default.
+	 * You should only set this to value if your theme.js file includes jQuery.
+	 */
 	var $include_jquery = true;
 
-
-	/*
-
-	Loads an options panel in wp-admin.
-	If this is enabled, you create custom fields and target them to this option panel.
-
-	*/
+	/**
+	 * Loads an options panel in wp-admin.
+	 * If this is enabled, you create custom fields and target them to this option panel.
+	 */
 	var $load_options_panel = true;
 
 
-	/*
-
-	if you want to force disable to WP theme editor, set this to true.
-	Since we keep our WP themes in version control, we set this to true by default.
-
-	*/
+	/**
+	 * if you want to force disable to WP theme editor, set this to true.
+	 * Since we keep our WP themes in version control, we set this to true by default.
+	 */
 	var $disabled_theme_editor = true;
 
 
-	/*
-
-	toggle featured image support on your posts and pages
-
-	*/
+	/**
+	 * toggle featured image support on your posts and pages
+	 */
 	var $load_thumbnail_support = true;
 
-
-	/*
-
-	this allows you to edit the default text that appears with post excerpts.
-	If you set this to null, a simple "..." will output at the end of each excerpt.
-
-	*/
+	/**
+	 * this allows you to edit the default text that appears with post excerpts.
+	 * If you set this to null, a simple "..." will output at the end of each excerpt.
+	 */
 	var $excerpt_text = 'Read More';
 
-
-	/*
-
-	by default, the theme will disable the ACF Options menu in wp-admin, unless WP_DEBUG is set to true.
-	If you want to force enable to ACF options panel to display, you can set this variable as true
-
-	*/
+	/**
+	 * by default, the theme will disable the ACF Options menu in wp-admin, unless WP_DEBUG is set to true.
+	 * If you want to force enable to ACF options panel to display, you can set this variable as true
+	 */
 	var $force_enable_acf_option_panel = false;
 
-
+	/**
+	 * Theme constructor.
+	 */
 	public function __construct() {
-
 		parent::__construct();
 
 		$this->theme_name = defined( 'THEME_NAME' ) ? THEME_NAME : 'base-theme';
 		$this->version    = getenv( 'VERSION' ) ? getenv( 'VERSION' ) : '1.0';
-
 	}
 
-
-	/* Load more custom post types here */
+	/**
+	 * Load more custom post types here
+	 */
 	public function load_custom_post_types() {
-
 		// Sample Custom Post Type - Add as many as you'd like
 
 		/*
@@ -95,11 +77,11 @@ class Theme extends base_theme_class {
 			// any additional options can be added as defined in WP codex: https://codex.wordpress.org/Function_Reference/register_post_type
 		);
 		*/
-
-
 	}
 
-
+	/**
+	 *
+	 */
 	public function load_custom_taxonomies() {
 
 		// Sample Custom Taxonomy - Add as many as you'd like
@@ -120,6 +102,9 @@ class Theme extends base_theme_class {
 		*/
 	}
 
+	/**
+	 *
+	 */
 	public function load_shortcodes() {
 
 		//This is a sample shortcode.  Please see full shortcode documentation.
@@ -136,13 +121,12 @@ class Theme extends base_theme_class {
 			));
 
 		});*/
-
-
 	}
 
-
+	/**
+	 *
+	 */
 	public function load_sidebars() {
-
 		/*register_sidebar(array(
 			'name'          => 'Primary',
 			'id'            => 'sidebar-primary',
@@ -151,12 +135,12 @@ class Theme extends base_theme_class {
 			'before_title'  => '<h3>',
 			'after_title'   => '</h3>',
 		));*/
-
-
 	}
 
+	/**
+	 *
+	 */
 	public function load_options_panel() {
-
 		acf_add_options_page( array(
 			'page_title' => 'Theme Options',
 			'menu_title' => 'Options',
@@ -176,17 +160,16 @@ class Theme extends base_theme_class {
 			'menu_title'  => 'Javascript / CSS',
 			'parent_slug' => 'theme-options-settings',
 		) );
-
-
 	}
 
+	/**
+	 *
+	 */
 	public function set_menus() {
-
 		$this->menus = array(
 			'main_nav'   => 'Main Navigation',
 			'footer_nav' => 'Footer Navigation'
 		);
-
 	}
 
 	/**
@@ -197,7 +180,6 @@ class Theme extends base_theme_class {
 	 * set crop to false to not force the size.
 	 */
 	public function set_image_sizes() {
-
 		$this->image_sizes[] = array(
 			'name'   => 'medium-size',
 			'width'  => 600,
@@ -208,5 +190,4 @@ class Theme extends base_theme_class {
 
 }
 
-$theme = new \BaseTheme\Theme;
-
+$theme = new Theme;

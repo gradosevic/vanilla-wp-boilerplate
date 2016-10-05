@@ -1,5 +1,11 @@
-<?php namespace Laravel;
+<?php
 
+namespace Laravel;
+
+/**
+ * Class Blade
+ * @package Laravel
+ */
 class Blade {
 
 	/**
@@ -71,7 +77,7 @@ class Blade {
 	/**
 	 * Get the fully qualified path for a compiled view.
 	 *
-	 * @param  string $view
+	 * @param  string $path
 	 *
 	 * @return string
 	 */
@@ -97,7 +103,7 @@ class Blade {
 	/**
 	 * Compiles the specified file containing Blade pseudo-code into valid PHP.
 	 *
-	 * @param  string $path
+	 * @param  string $view
 	 *
 	 * @return string
 	 */

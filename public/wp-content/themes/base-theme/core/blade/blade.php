@@ -1,5 +1,6 @@
 <?php
-//WARNING: This file has been modified from it's original version by Zach Adams on 10-19-2014. You can find the original source code here: https://github.com/MikaelMattsson/blade
+// WARNING: This file has been modified from it's original version by Zach Adams on 10-19-2014.
+// You can find the original source code here: https://github.com/MikaelMattsson/blade
 
 /**
  * Root

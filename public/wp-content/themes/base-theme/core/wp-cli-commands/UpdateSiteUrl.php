@@ -6,12 +6,8 @@
 class UpdateSiteUrl_Command extends WP_CLI_Command {
 
 	function __invoke( $args, $assoc_args ) {
-
-
 		if ( ! isset( $args[0] ) ) {
-
 			WP_CLI::error( 'You must include the domain that you want to set as the site url.' );
-
 		}
 
 		$url = 'http://' . rtrim( $args[0], '/' );

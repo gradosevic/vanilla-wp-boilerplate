@@ -42,10 +42,9 @@ class WP_Blade_Main_Controller {
 
 	/**
 	 * Return a new class instance.
-	 * @return { obj } class instance
+	 * @return WP_Blade_Main_Controller class instance
 	 */
 	public static function make() {
-
 		return new self();
 	}
 

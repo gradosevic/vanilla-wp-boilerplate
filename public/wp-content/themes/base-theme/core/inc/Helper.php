@@ -9,17 +9,18 @@ function asset( $name ) {
 	 * @return string
 	 */
 	return Helper::asset( $name );
-
 }
 
+/**
+ * Class Helper
+ */
 class Helper {
 
 	/**
 	 * Helper function that returns the first word of a string.
 	 *
 	 * @param  string
-	 *
-	 * @return First word of the string param
+	 * @return string - First word of the string param
 	 */
 	public static function get_first_word( $string ) {
 
@@ -30,6 +31,7 @@ class Helper {
 
 	/**
 	 * Page titles
+	 * @return string
 	 */
 	public static function index_title() {
 		if ( is_home() ) {
@@ -80,15 +82,19 @@ class Helper {
 	 * Helper method that returns a file from the public directory.
 	 *
 	 * @param  $name - path to asset
-	 *
-	 * @return path/to/asset
+	 * @return string - path/to/asset
 	 */
 	public static function asset( $name ) {
-
 		return get_template_directory_uri() . "/assets/{$name}";
-
 	}
 
+	/**
+	 * @param $attachment_id
+	 * @param string $size
+	 * @param string $attr
+	 *
+	 * @return string
+	 */
 	public static function image( $attachment_id, $size = 'thumbnail', $attr = '' ) {
 
 		$icon  = false;
@@ -135,23 +141,20 @@ class Helper {
 	 * Return Breadcrumbs
 	 *
 	 * @param  int
-	 *
-	 * @return Response
+	 * @return string
 	 */
 	public static function breadcrumbs() {
 		if ( function_exists( 'yoast_breadcrumb' ) ) {
 			$breadcrumbs = yoast_breadcrumb( '<li>', '</li>', false );
-
 			$breadcrumbs = str_replace( '|', '</li><li>', $breadcrumbs );
-
 
 			echo "<ul>{$breadcrumbs}</ul>";
 		}
-
 	}
 
 	/**
 	 * Returns the thumbnail with a caption.
+	 * @return string
 	 */
 	public static function the_post_thumbnail_caption() {
 		global $post;

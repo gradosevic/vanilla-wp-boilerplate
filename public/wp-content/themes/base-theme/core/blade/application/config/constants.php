@@ -13,7 +13,6 @@
 | Constants to standarize things
 */
 
-
 /**
  * Path for the helpers folder
  */
@@ -57,7 +56,6 @@ define( 'BLADE_EXT', '.blade.php' );
 if ( ! defined( 'DS' ) ) {
 	define( 'DS', DIRECTORY_SEPARATOR );
 }
-
 
 // Default bundle
 define( 'DEFAULT_BUNDLE', 'application' );

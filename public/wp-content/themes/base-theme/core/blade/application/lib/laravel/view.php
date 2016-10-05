@@ -1,8 +1,14 @@
-<?php namespace Laravel;
+<?php
+
+namespace Laravel;
 
 use ArrayAccess;
 use Closure;
 
+/**
+ * Class View
+ * @package Laravel
+ */
 class View implements ArrayAccess {
 
 	/**
@@ -535,6 +541,12 @@ class View implements ArrayAccess {
 	 * Magic Method for handling dynamic functions.
 	 *
 	 * This method handles calls to dynamic with helpers.
+	 *
+	 * @param $method
+	 * @param $parameters
+	 *
+	 * @return View
+	 * @throws \Exception
 	 */
 	public function __call( $method, $parameters ) {
 		if ( strpos( $method, 'with_' ) === 0 ) {

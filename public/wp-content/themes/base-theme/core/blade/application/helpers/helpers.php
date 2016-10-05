@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @param $haystack
+ * @param $needles
+ *
+ * @return bool
+ */
 function starts_with( $haystack, $needles ) {
 	foreach ( (array) $needles as $needle ) {
 		if ( strpos( $haystack, $needle ) === 0 ) {
@@ -10,6 +16,12 @@ function starts_with( $haystack, $needles ) {
 	return false;
 }
 
+/**
+ * @param $view
+ * @param array $data
+ *
+ * @return \Laravel\View
+ */
 function view( $view, $data = array() ) {
 	return Laravel\View::make( $view, $data );
 }
@@ -32,14 +44,20 @@ function str_contains( $haystack, $needle ) {
 	return false;
 }
 
-
+/**
+ * @param array $args
+ *
+ * @return array
+ */
 function queryToArray( $args = array() ) {
 	$query = new WP_Query( $args );
 
 	return $query->get_posts();
 }
 
-
+/**
+ * @param $path
+ */
 function blade_set_storage_path( $path ) {
 	$GLOBALS['blade_storage_path'] = $path;
 }

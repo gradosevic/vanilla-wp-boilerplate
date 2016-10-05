@@ -2,6 +2,10 @@
 
 namespace BaseTheme;
 
+/**
+ * Class base_theme_class
+ * @package BaseTheme
+ */
 abstract class base_theme_class {
 
 	/* Set this to the version of your theme */
@@ -26,7 +30,7 @@ abstract class base_theme_class {
 	public $menus;
 
 
-	/* This allows you to enable/disable the theme editor. */
+	/** This allows you to enable/disable the theme editor. */
 	public $disabled_theme_editor;
 
 	/**
@@ -35,7 +39,7 @@ abstract class base_theme_class {
 	 *
 	 * @param  int
 	 *
-	 * @return Response
+	 * @return string
 	 */
 	public $excerpt_text;
 
@@ -47,9 +51,8 @@ abstract class base_theme_class {
 	public $load_options_panel;
 
 
-	/* This allows you to enable/disable the post thumbnail. */
+	/** This allows you to enable/disable the post thumbnail. */
 	public $load_thumbnail_support;
-
 
 	/**
 	 * By default, the ACF Option panel is wp-admin is hidden unless WP_DEBUG is defined as true.
@@ -61,7 +64,6 @@ abstract class base_theme_class {
 	 * This is the variable where you add the custom post types to be loaded into the theme
 	 */
 	public $custom_post_types;
-
 
 	/**
 	 * This is the variable where you add the custom taxonomies to be loaded into the theme
@@ -103,62 +105,43 @@ abstract class base_theme_class {
 
 		define( 'DISALLOW_FILE_EDIT', $this->disabled_theme_editor );
 
-
 		add_action( 'init', array( $this, 'load_wp_cli_commands' ) );
-
 
 		/* Load shortcodes */
 		if ( method_exists( $this, 'load_shortcodes' ) ) {
-
 			$this->load_shortcodes();
-
 		}
 
 		/* Load all custom post types */
 		if ( method_exists( $this, 'load_custom_post_types' ) ) {
-
 			add_action( 'init', array( $this, 'add_custom_post_types' ) );
-
 		}
 
 		/* Load all custom post types */
 		if ( method_exists( $this, 'load_custom_taxonomies' ) ) {
-
 			add_action( 'init', array( $this, 'add_custom_taxonomies' ) );
-
 		}
 
 		/* Load all options panels if not globally disabled */
 		if ( method_exists( $this, 'load_options_panel' ) && $this->load_options_panel == true ) {
-
 			$this->load_options_panel();
-
 		}
-
 
 		/* Load all dynamic sidebars */
 		if ( method_exists( $this, 'load_sidebars' ) ) {
-
 			add_action( 'widgets_init', array( $this, 'load_sidebars' ) );
-
 		}
-
 
 		/* Load all image sizes */
 		if ( method_exists( $this, 'set_image_sizes' ) ) {
-
 			$this->set_image_sizes();
 			$this->load_thumbnail_support();
-
 		}
-
 
 		/* Set all menus and load menu support */
 		if ( method_exists( $this, 'set_menus' ) ) {
-
 			$this->set_menus();
 			$this->load_menu_support();
-
 		}
 
 		/* Remove all junk */
@@ -167,38 +150,26 @@ abstract class base_theme_class {
 
 	/**
 	 * Loads the blade template engine.
-	 *
 	 */
 	protected function load_blade_templating() {
-
 		if ( ! class_exists( 'WP_Blade_Main_Controller' ) ) {
 			include_once( 'blade/blade.php' );
 		}
-
 	}
 
 	/**
 	 * Loads ACF if the plugin is not included.
 	 */
 	public function include_advanced_custom_fields() {
-
-
 		if ( ! class_exists( 'acf' ) ) {
-
 			add_filter( 'acf/settings/path', array( $this, 'my_acf_settings_path' ) );
 			add_filter( 'acf/settings/dir', array( $this, 'my_acf_settings_dir' ) );
 
-
 			include_once( 'acf/acf.php' );
 
-
 			if ( WP_DEBUG == false && $this->force_enable_acf_option_panel === false ) {
-
 				add_filter( 'acf/settings/show_admin', '__return_false' );
-
 			}
-
-
 		}
 
 		add_filter( 'acf/format_value', array( $this, 'parse_template_directory' ), 10, 3 );
@@ -213,28 +184,17 @@ abstract class base_theme_class {
 
 	/**
 	 * Display the specified resource.
-	 *
-	 * @param  int
-	 *
-	 * @return Response
 	 */
 	protected function load_thumbnail_support() {
-
-
 		if ( $this->load_thumbnail_support === true ) {
 			add_theme_support( 'post-thumbnails' );
 		}
 
 		if ( is_array( $this->image_sizes ) ) {
-
 			foreach ( $this->image_sizes as $size ) {
-
 				add_image_size( $size['name'], $size['width'], $size['height'], $size['crop'] );
-
 			}
-
 		}
-
 	}
 
 	/**

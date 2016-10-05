@@ -1,12 +1,7 @@
 <?php
-/**
- *
- * Main plugin model
- * @package Blade
- */
 
 /**
- * Main model
+ * Class WP_Blade_Main_Model
  */
 class WP_Blade_Main_Model {
 
@@ -17,40 +12,36 @@ class WP_Blade_Main_Model {
 
 	/**
 	 * Return a new class instance
-	 * @return { obj } class instance
+	 * @return WP_Blade_Main_Model
 	 */
 	public static function make() {
-
 		return new self();
 	}
 
 	/**
 	 * Return a call of templateinclude blade passing template path.
 	 *
-	 * @param { str }
-	 *
-	 * @return { str } path of the compiled view
+	 * @param string $template
+	 * @return string path of the compiled view path of the compiled view
 	 */
 	function get_query_template( $template ) {
-
 		return $this->template_include_blade( $template );
 	}
 
 	/**
 	 * Handle the compilation of the templates
 	 *
-	 * @param { str } template path
-	 *
-	 * @return { str } compiled template path
+	 * @param string template path
+	 * @return string compiled template path compiled template path
 	 */
 	public function template_include_blade( $template ) {
-
 		if ( $this->bladedTemplate ) {
 			return $this->bladedTemplate;
 		}
+
 		if ( ! $template ) {
 			return $template;
-		} // Noting to do here. Come back later.
+		}
 
 		require_once( WP_BLADE_CONFIG_PATH . 'paths.php' );
 
@@ -71,7 +62,5 @@ class WP_Blade_Main_Model {
 		}
 
 		return $this->bladedTemplate = $view->path;
-
 	}
-
 }

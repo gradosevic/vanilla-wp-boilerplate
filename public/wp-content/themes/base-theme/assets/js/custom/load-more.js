@@ -1,39 +1,24 @@
-jQuery(document).ready(function($)
-{   
+jQuery(document).ready(function ($) {
 
-    $('.btn-load-more-ajax a').on('click',function()
-    {
-        var btn = $(this);
+    $('.btn-load-more-ajax a').on('click', function () {
+        var btn = $(this),
+            contentTarget = btn.parent().data('target'),
+            appendTo = btn.parent().data('append-to'),
+            loadMore = btn.parent().data('load-more');
 
-        var contentTarget = btn.parent().data('target');
+        $.get(btn.attr('href'), function (data) {
+            var nextBtn = $(data).find(loadMore).attr('href');
 
-        var hello_world = 'tester2';
-        var appendTo = btn.parent().data('append-to');
+            $(appendTo).append($(data).find(contentTarget));
 
-        var loadMore = btn.parent().data('load-more');
-
-        $.get(btn.attr('href'), function(data)
-        {
-
-
-            $( appendTo ).append($(data).find( contentTarget ));
-
-
-            var nextBtn = $(data).find( loadMore ).attr('href');
-
-            if(nextBtn)
-            {
-
-                btn.attr('href',nextBtn);
-            }
-            else
-            {
+            if (nextBtn) {
+                btn.attr('href', nextBtn);
+            } else {
                 btn.parent().hide();
             }
-
         });
 
         return false;
     });
-    
+
 });

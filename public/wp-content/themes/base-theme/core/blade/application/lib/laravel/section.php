@@ -1,5 +1,11 @@
-<?php namespace Laravel;
+<?php
 
+namespace Laravel;
+
+/**
+ * Class Section
+ * @package Laravel
+ */
 class Section {
 
 	/**

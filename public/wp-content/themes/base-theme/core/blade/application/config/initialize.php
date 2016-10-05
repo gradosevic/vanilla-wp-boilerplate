@@ -60,7 +60,6 @@ foreach ( $libraries as $filename ) {
 | Helpers functions and classes
 |
 */
-
 $helpers = array( 'wp-blade', 'helpers' );
 
 foreach ( $helpers as $filename ) {
@@ -77,7 +76,6 @@ foreach ( $helpers as $filename ) {
 | controllers call.
 |
 */
-
 $models = array( 'main-model' );
 
 foreach ( $models as $filename ) {
@@ -93,7 +91,6 @@ foreach ( $models as $filename ) {
 | certain hook being it an ajax request or other.
 |
 */
-
 $controllers = array( 'main-controller' );
 
 foreach ( $controllers as $filename ) {
