@@ -1,9 +1,11 @@
-@layout('layouts/master')
+@extends('layouts/master')
 
 @section('content')
 
-<pre>
-    {{ var_dump($post) }}
-</pre>
+    <?php $post = get_post() ?>
+
+    <pre>
+        {{ var_dump($post) }}
+    </pre>
     
 @endsection

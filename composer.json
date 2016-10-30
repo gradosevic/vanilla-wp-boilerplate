@@ -1,5 +1,6 @@
 {
     "require": {
-        "vlucas/phpdotenv": "^2.0"
+        "vlucas/phpdotenv": "^2.0",
+        "illuminate/view": "^5.3"
     }
 }

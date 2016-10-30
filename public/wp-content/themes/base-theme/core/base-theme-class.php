@@ -419,9 +419,8 @@ abstract class base_theme_class {
 	public function clear_blade_cache() {
 
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
-			$cachedViewsDirectory = WP_BLADE_ROOT . 'storage/views/';
 
-			$files = glob( $cachedViewsDirectory . '*' );
+			$files = glob( BLADE_COMPILED_PATH . DS . '*.php' );
 
 			foreach ( $files as $file ) {
 				if ( is_file( $file ) ) {

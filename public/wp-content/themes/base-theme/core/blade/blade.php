@@ -1,32 +1,20 @@
 <?php
-// WARNING: This file has been modified from it's original version by Zach Adams on 10-19-2014.
-// You can find the original source code here: https://github.com/MikaelMattsson/blade
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
+require_once __DIR__ . DS . 'model.php';
+require_once __DIR__ . DS . 'factory.php';
 
-/**
- * Root
- */
-define( 'WP_BLADE_ROOT', dirname( __FILE__ ) . '/' );
+// Instantiate main model
+$factory = WP_Blade_Factory::make();
+$model = new WP_Blade_Model($factory);
 
-/**
- * Path for the application folder inside the theme
- */
-define( 'WP_BLADE_APP_PATH', WP_BLADE_ROOT . 'application/' );
+// Bind to template include action
+add_action( 'template_include', array( $model, 'template_include_blade' ) );
 
-/**
- * Path of assets
- */
-define( 'WP_BLADE_ASSETS_PATH', WP_BLADE_ROOT . 'assets/' );
+// Listen for index template filter
+add_filter( 'index_template', array( $model, 'template_include_blade' ) );
 
-/**
- * Path for the config folder
- */
-define( 'WP_BLADE_CONFIG_PATH', WP_BLADE_APP_PATH . 'config/' );
+// Listen for page template filter
+add_filter( 'page_template', array( $model, 'template_include_blade' ) );
 
-/**
- * Path for libraries
- */
-define( 'WP_BLADE_LIBRARIES_PATH', WP_BLADE_APP_PATH . 'lib/' );
-
-
-require_once( WP_BLADE_CONFIG_PATH . '/initialize.php' );
-WP_Blade_Main_Controller::make();
+// Listen for Buddypress include action
+add_filter( 'bp_template_include', array( $model, 'template_include_blade' ) );
